@@ -68,4 +68,12 @@ public class EmployeeController {
             employeeList.remove(id);
             return ResponseEntity.noContent().build();
         }
+        @GetMapping("/employees/page")
+        public List<Employee> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
+        int startIndex=(page-1)*pageSize;
+            int endIndex=Math.min(startIndex+pageSize,employeeList.size());
+            if(startIndex>=employeeList.size()){
+                return new ArrayList<>();
+            }
+            return employeeList.subList(startIndex,endIndex);}
 }

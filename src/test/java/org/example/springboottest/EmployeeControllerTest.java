@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -181,4 +182,33 @@ mockMvc.perform(post("/employees")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
     }
-}
+    @Test
+    void should_get_employee_by_page() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            String requestBody = String.format("""
+                            {
+                            "name":"employee%d",
+                            "gender":"male",
+                            "salary":%d,
+                            "age":%d
+                            }
+                    """, i, 5000 + i * 1000, 25 + i);
+            mockMvc.perform(post("/employees")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .content(requestBody))
+                    .andExpect(status().isOk());
+        }
+            mockMvc.perform(get("/employees/page?page=1&pageSize=5")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(5)))
+                    .andExpect(jsonPath("$[0].name").value("employee0"))
+                    .andExpect(jsonPath("$[4].name").value("employee4"));
+             mockMvc.perform(get("/employees/page?page=2&pageSize=5")
+                     .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(5)))
+                    .andExpect(jsonPath("$[0].name").value("employee5"))
+                    .andExpect(jsonPath("$[4].name").value("employee9"));
+    }
+    }
