@@ -105,4 +105,23 @@ class CompanyControllerTest {
                 .andExpect(jsonPath("$.id").value(1));
 
 }
+@Test
+    void deleteCompanyById() throws Exception {
+        String requestBody = """
+                                {
+                                "name":"alibaba"
+                }
+                """;
+        mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                    .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/companies/0")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/companies")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }
