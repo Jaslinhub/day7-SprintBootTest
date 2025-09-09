@@ -19,7 +19,10 @@ public class EmployeeController {
         return Map.of("id",employeeId,"name",employee.getName());
 
     }
-
+    @GetMapping("/employees/All")
+    public List<Employee> getAllEmployees(){
+        return employeeList;
+    }
     @GetMapping("/employees/{id}")
     public Employee getEmployeeById(@PathVariable int id){
         for(Employee employee:employeeList){

@@ -106,4 +106,35 @@ mockMvc.perform(post("/employees")
                 .andExpect(jsonPath("$[0].gender").value(expect.getGender()))
                 .andExpect(jsonPath("$[0].salary").value(expect.getSalary()));
     }
-}
+
+    @Test
+    void should_get_all_employee_when_getAllEmployees() throws Exception {
+        String requestBody="""
+                {
+                "name":"joe",
+                "gender":"male",
+                "salary":7000.0
+                }
+""";
+        mockMvc.perform(post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isOk());
+        String requestBody2="""
+                {
+                "name":"jade",
+                "gender":"female",
+                "salary":78000.0
+                }
+""";
+        mockMvc.perform(post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody2))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/employees/All")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("joe"))
+                .andExpect(jsonPath("$[1].name").value("jade"));
+    }
+    }
