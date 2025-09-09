@@ -9,9 +9,16 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String name, int id, String gender, double salary) {
-        this.name = name;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public Employee(String name, String gender, double salary) {
+        this.name = name;
         this.gender = gender;
         this.salary = salary;
     }
@@ -24,13 +31,6 @@ public class Employee {
         this.name = name;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getGender() {
         return gender;

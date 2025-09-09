@@ -13,10 +13,13 @@ public class EmployeeController {
 
     @PostMapping("/employees")
     public Map<String,Object> createEmployee(@RequestBody Employee employee){
+        int employeeId=employeeList.size();
+        employee.setId(employeeId);
         employeeList.add(employee);
-        return Map.of("id",employeeList.size()-1,"name",employee.getName());
+        return Map.of("id",employeeId,"name",employee.getName());
 
     }
+
     @GetMapping("/employees/{id}")
     public Employee getEmployeeById(@PathVariable int id){
         for(Employee employee:employeeList){
