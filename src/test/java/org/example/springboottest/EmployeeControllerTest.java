@@ -137,4 +137,31 @@ mockMvc.perform(post("/employees")
                 .andExpect(jsonPath("$[0].name").value("joe"))
                 .andExpect(jsonPath("$[1].name").value("jade"));
     }
+    @Test
+    void should_update_employee_age_and_salary() throws Exception {
+        String requestBody = """
+                {
+                "name":"joe",
+                "gender":"male",
+                "salary":7000.0
+                }
+        """;
+        mockMvc.perform(post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isOk());
+
+        String updateRequestBody = """
+                {
+                "gender":"female",
+                "salary": 7500.0
+                }
+        """;
+        mockMvc.perform(put("/employees/0")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(updateRequestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.gender").value("female"))
+                .andExpect(jsonPath("$.salary").value(7500.0));
+    }
     }

@@ -1,7 +1,9 @@
 package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Employee;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,19 @@ public class EmployeeController {
             }
     }
         return filteredEmployees;
+    }
+    @PutMapping("/employees/{id}")
+    public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) {
+        for (Employee employee : employeeList) {
+            if (employeeList.indexOf(employee) == id) {
+                employee.setName(updatedEmployee.getName());
+                employee.setGender(updatedEmployee.getGender());
+                employee.setSalary(updatedEmployee.getSalary());
+                return employee;
+            }
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
     }
 
 }
