@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,5 +61,22 @@ class CompanyControllerTest {
                 .andExpect(jsonPath("$[0].name").value("alibaba"))
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("bytedance"));
+    }
+    @Test
+    void getCompanyById() throws Exception {
+        String requestBody = """
+                                {
+                                "name":"alibaba"
+                }
+                """;
+        mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                    .andExpect(status().isOk());
+       mockMvc.perform(get("/companies/{id}", 0)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("alibaba"))
+                .andExpect(jsonPath("$.id").value(1));
     }
 }

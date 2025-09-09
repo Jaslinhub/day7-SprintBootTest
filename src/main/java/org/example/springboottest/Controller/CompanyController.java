@@ -2,10 +2,7 @@ package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Company;
 import org.example.springboottest.Entity.Employee;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +22,15 @@ public class CompanyController {
     @GetMapping("/companies")
     public List<Company> getAllCompanies(){
         return companies;
+    }
+    @GetMapping("/companies/{id}")
+    public Company getCompanyById(@PathVariable int id){
+        for(Company company:companies){
+            if(companies.indexOf(company)==id){
+                return company;
+            }
+        }
+        return null;
     }
 
 }
