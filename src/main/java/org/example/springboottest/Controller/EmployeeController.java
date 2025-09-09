@@ -2,6 +2,7 @@ package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Employee;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -59,4 +60,12 @@ public class EmployeeController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
     }
 
+    @DeleteMapping("/employees/{id}")
+    public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) {
+            if (employeeList.get(id) == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
+            }
+            employeeList.remove(id);
+            return ResponseEntity.noContent().build();
+        }
 }

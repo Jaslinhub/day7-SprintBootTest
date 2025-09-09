@@ -164,4 +164,21 @@ mockMvc.perform(post("/employees")
                 .andExpect(jsonPath("$.gender").value("female"))
                 .andExpect(jsonPath("$.salary").value(7500.0));
     }
+    @Test
+    void should_delete_employee_by_id() throws Exception {
+        String requestBody = """
+                {
+                "name":"joe",
+                "gender":"male",
+                "salary":7000.0
+                }
+        """;
+        mockMvc.perform(post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/employees/0")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNoContent());
     }
+}
