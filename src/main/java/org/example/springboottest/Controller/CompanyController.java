@@ -2,7 +2,9 @@ package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Company;
 import org.example.springboottest.Entity.Employee;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,5 +34,16 @@ public class CompanyController {
         }
         return null;
     }
+    @PutMapping("/companies/{id}")
+    public Company updateCompanyById(@PathVariable int id,@RequestBody Company updatedCompany) {
+        for (Company company : companies) {
+            if (companies.indexOf(company) == id) {
+                company.setName(updatedCompany.getName());
+                return company;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found with ID: " +id);
+    }
+
 
 }
