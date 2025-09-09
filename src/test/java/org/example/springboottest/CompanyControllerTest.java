@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -123,5 +124,32 @@ class CompanyControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+@Test
+    void getCompaniesByPage() throws Exception {
+    for (int i = 0; i < 10; i++) {
+        String requestBody = String.format("""
+                            {
+                            "name":"company%d"
+
+                            }
+                    """, i);
+        mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                    .andExpect(status().isOk());
+    }
+   mockMvc.perform(get("/companies/page?page=1&pageSize=5")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0].name").value("company0"))
+            .andExpect(jsonPath("$[4].name").value("company4"));
+    mockMvc.perform(get("/companies/page?page=2&pageSize=5")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0].name").value("company5"))
+            .andExpect(jsonPath("$[4].name").value("company9"));
     }
 }

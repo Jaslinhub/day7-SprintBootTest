@@ -54,5 +54,13 @@ public class CompanyController {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found with ID: " +id);
     }
-
+@GetMapping("/companies/page")
+    public List<Company> getCompaniesByPage(@RequestParam int page,@RequestParam int pageSize){
+        int startIndex=(page-1)*pageSize;
+        int endIndex=Math.min(startIndex+pageSize,companies.size());
+        if(startIndex>=companies.size()){
+            return new ArrayList<>();
+        }
+        return companies.subList(startIndex,endIndex);
+    }
 }
