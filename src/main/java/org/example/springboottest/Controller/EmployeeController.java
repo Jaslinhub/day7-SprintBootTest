@@ -7,19 +7,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 public class EmployeeController {
     private List<Employee> employeeList=new ArrayList<>();
+    private  int currentId=1;
 
     @PostMapping("/employees")
-    public Map<String,Object> createEmployee(@RequestBody Employee employee){
-        int employeeId=employeeList.size();
-        employee.setId(employeeId);
+    public Map<String,Object> createEmployee(@RequestBody Employee employee){;
+        employee.setId(currentId);
+        currentId++;
         employeeList.add(employee);
-        return Map.of("id",employeeId,"name",employee.getName());
+        return Map.of("id",employee.getId(),"name",employee.getName());
 
     }
     @GetMapping("/employees/All")
@@ -29,7 +31,7 @@ public class EmployeeController {
     @GetMapping("/employees/{id}")
     public Employee getEmployeeById(@PathVariable int id){
         for(Employee employee:employeeList){
-            if(employeeList.indexOf(employee)==id){
+            if(employee.getId()==id){
                 return employee;
             }
         }
@@ -49,7 +51,7 @@ public class EmployeeController {
     @PutMapping("/employees/{id}")
     public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) {
         for (Employee employee : employeeList) {
-            if (employeeList.indexOf(employee) == id) {
+            if (employee.getId()==id) {
                 employee.setName(updatedEmployee.getName());
                 employee.setGender(updatedEmployee.getGender());
                 employee.setSalary(updatedEmployee.getSalary());
@@ -62,18 +64,27 @@ public class EmployeeController {
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) {
-            if (employeeList.get(id) == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
+        Iterator<Employee> iterator = employeeList.iterator();
+        while (iterator.hasNext()) {
+            Employee employee = iterator.next();
+            if (employee.getId() == id) {
+                iterator.remove();
+               return ResponseEntity.noContent().build();
             }
-            employeeList.remove(id);
-            return ResponseEntity.noContent().build();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
         }
         @GetMapping("/employees/page")
-        public List<Employee> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
+        public ResponseEntity<List<Employee>> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
         int startIndex=(page-1)*pageSize;
             int endIndex=Math.min(startIndex+pageSize,employeeList.size());
             if(startIndex>=employeeList.size()){
-                return new ArrayList<>();
+                return ResponseEntity.notFound().build();
             }
-            return employeeList.subList(startIndex,endIndex);}
+            return ResponseEntity.status(HttpStatus.OK).body(employeeList.subList(startIndex,endIndex));}
+
+    public void clearEmployees() {
+        employeeList.clear();
+        currentId = 1;
+    }
 }
