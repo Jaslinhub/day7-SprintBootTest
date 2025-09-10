@@ -2,11 +2,21 @@ package org.example.springboottest.Entity;
 
 public class Employee {
     private String name;
+    private int age;
     private int id;
     private String gender;
     private double salary;
+    private boolean status;
 
     public Employee() {
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public int getId() {
@@ -46,5 +56,12 @@ public class Employee {
 
     public void setSalary(double salary) {
         this.salary = salary;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+    public boolean getStatus() {
+        return status;
     }
 }

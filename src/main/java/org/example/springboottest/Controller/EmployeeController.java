@@ -1,6 +1,10 @@
 package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Employee;
+import org.example.springboottest.Service.EmployeeAlreadyExistsException;
+import org.example.springboottest.Service.EmployeeNotQualifiedException;
+import org.example.springboottest.Service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,78 +17,55 @@ import java.util.Map;
 
 @RestController
 public class EmployeeController {
-    private List<Employee> employeeList=new ArrayList<>();
-    private  int currentId=1;
+    @Autowired
+    private EmployeeService employeeService;
 
     @PostMapping("/employees")
-    public Map<String,Object> createEmployee(@RequestBody Employee employee){;
-        employee.setId(currentId);
-        currentId++;
-        employeeList.add(employee);
-        return Map.of("id",employee.getId(),"name",employee.getName());
+    public Map<String,Object> createEmployee(@RequestBody Employee employee) throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {;
+        return employeeService.addEmployee(employee);
+
 
     }
     @GetMapping("/employees/All")
     public List<Employee> getAllEmployees(){
-        return employeeList;
+        return employeeService.getAllEmployees();
+
     }
+
     @GetMapping("/employees/{id}")
     public Employee getEmployeeById(@PathVariable int id){
-        for(Employee employee:employeeList){
-            if(employee.getId()==id){
-                return employee;
-            }
-        }
-        return null;
+       return employeeService.getEmployeeById(id);
+
     }
 
     @GetMapping("/employees")
     public List<Employee> getAllEmployeesByGender(@RequestParam String gender){
-        List<Employee> filteredEmployees=new ArrayList<>();
-        for(Employee employee:employeeList){
-            if(employee.getGender().equals(gender)){
-                filteredEmployees.add(employee);
-            }
-    }
-        return filteredEmployees;
+        return employeeService.getAllEmployeesByGender(gender);
+
     }
     @PutMapping("/employees/{id}")
     public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) {
-        for (Employee employee : employeeList) {
-            if (employee.getId()==id) {
-                employee.setName(updatedEmployee.getName());
-                employee.setGender(updatedEmployee.getGender());
-                employee.setSalary(updatedEmployee.getSalary());
-                return employee;
-            }
-        }
+        return employeeService.updateEmployeeById(id,updatedEmployee);
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
+
+
     }
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) {
-        Iterator<Employee> iterator = employeeList.iterator();
-        while (iterator.hasNext()) {
-            Employee employee = iterator.next();
-            if (employee.getId() == id) {
-                iterator.remove();
-               return ResponseEntity.noContent().build();
-            }
+        return employeeService.deleteEmployeeById(id);
+
+
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with ID: " + id);
-        }
+
         @GetMapping("/employees/page")
         public ResponseEntity<List<Employee>> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
-        int startIndex=(page-1)*pageSize;
-            int endIndex=Math.min(startIndex+pageSize,employeeList.size());
-            if(startIndex>=employeeList.size()){
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(employeeList.subList(startIndex,endIndex));}
+        return employeeService.getEmployeesByPage(page,pageSize);
+
+        }
 
     public void clearEmployees() {
-        employeeList.clear();
-        currentId = 1;
+        employeeService.clear();
+
     }
 }

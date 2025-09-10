@@ -3,6 +3,8 @@ package org.example.springboottest;
 
 import org.example.springboottest.Controller.EmployeeController;
 import org.example.springboottest.Entity.Employee;
+import org.example.springboottest.Service.EmployeeAlreadyExistsException;
+import org.example.springboottest.Service.EmployeeNotQualifiedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +53,7 @@ class EmployeeControllerTest {
                 andExpect(jsonPath("$.id").value(1));
     }
     @Test
-    public void should_return_employees_when_get_all_given_null() throws Exception {
+    public void should_return_employees_when_get_all_given_null() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         mockMvc.perform(get("/employees/All").
                         contentType(MediaType.APPLICATION_JSON)).
@@ -62,7 +64,7 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$[0].salary").value(employee.getSalary()));
     }
     @Test
-    public void should_return_employees_when_get_given_id() throws Exception {
+    public void should_return_employees_when_get_given_id() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         mockMvc.perform(get("/employees/{id}", 1).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -73,7 +75,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    public void should_return_employees_when_get_given_gender() throws Exception {
+    public void should_return_employees_when_get_given_gender() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         employeeController.createEmployee(employee2);
         mockMvc.perform(get("/employees?gender=male")
@@ -86,14 +88,14 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.length()").value(1));
     }
     @Test
-    public void should_response_no_content_when_delete_given_employee_id() throws Exception {
+    public void should_response_no_content_when_delete_given_employee_id() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         mockMvc.perform(delete("/employees/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
     @Test
-    public void should_return_employees_when_get_by_page_given_page_size() throws Exception {
+    public void should_return_employees_when_get_by_page_given_page_size() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         employeeController.createEmployee(employee2);
         employeeController.createEmployee(employee3);
@@ -108,7 +110,7 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.length()").value(4));
     }
     @Test
-    public void should_return_matching_code_when_update_by_id_given_age_salary() throws Exception {
+    public void should_return_matching_code_when_update_by_id_given_age_salary() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         String requestBody = """
                 {
@@ -130,7 +132,7 @@ class EmployeeControllerTest {
 
 
     @Test
-    void should_throw_exception_when_get_given_page_out_of_all() throws Exception {
+    void should_throw_exception_when_get_given_page_out_of_all() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         employeeController.createEmployee(employee2);
         employeeController.createEmployee(employee3);
@@ -142,7 +144,7 @@ class EmployeeControllerTest {
 
     }
     @Test
-    void should_throw_exception_when_get_given_employee_not_exsiting() throws Exception {
+    void should_throw_exception_when_get_given_employee_not_exsiting() throws Exception, EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         employeeController.createEmployee(employee);
         String requestBody = """
                 {
