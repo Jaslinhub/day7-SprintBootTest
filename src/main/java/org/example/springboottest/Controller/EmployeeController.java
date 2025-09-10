@@ -2,6 +2,7 @@ package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Employee;
 import org.example.springboottest.Service.EmployeeAlreadyExistsException;
+import org.example.springboottest.Service.EmployeeAlreadyInactiveException;
 import org.example.springboottest.Service.EmployeeNotQualifiedException;
 import org.example.springboottest.Service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class EmployeeController {
 
     }
     @PutMapping("/employees/{id}")
-    public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) {
+    public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) throws EmployeeAlreadyInactiveException {
         return employeeService.updateEmployeeById(id,updatedEmployee);
 
 
@@ -52,7 +53,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/employees/{id}")
-    public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) {
+    public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) throws EmployeeAlreadyInactiveException {
         return employeeService.deleteEmployeeById(id);
 
 

@@ -63,11 +63,9 @@ public class EmployeeRepository {
     }
 
     public ResponseEntity<Void> deleteEmployeeById(int id) {
-        Iterator<Employee> iterator = employeeList.iterator();
-        while (iterator.hasNext()) {
-            Employee employee = iterator.next();
+        for (Employee employee : employeeList) {
             if (employee.getId() == id) {
-                iterator.remove();
+                employee.setStatus(false);
                 return ResponseEntity.noContent().build();
             }
         }

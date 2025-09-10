@@ -37,7 +37,6 @@ class EmployeeServiceTest {
     @Test
     void should_throw_exception_when_employee_is_not_existed() {
         when(employeeRepository.getEmployeeById(1)).thenReturn(null);
-       /* Employee foundEmployee = employeeService.getEmployeeById();*/
         assertThrows(EmployeeNotFoundException.class, () -> {
             employeeService.getEmployeeById(1);
         });
@@ -122,17 +121,70 @@ class EmployeeServiceTest {
 
         verify(employeeRepository, times(0)).add(any());
     }
-    /*@Test
-    void should_set_status_false_when_delete_employee() throws EmployeeNotFoundException {
+    @Test
+    void should_set_status_false_when_delete_employee() throws EmployeeNotFoundException, EmployeeNotQualifiedException, EmployeeAlreadyExistsException, EmployeeAlreadyInactiveException {
         Employee existingEmployee = new Employee();
         existingEmployee.setName("John");
         existingEmployee.setGender("male");
         existingEmployee.setAge(35);
         existingEmployee.setSalary(25000);
-        employeeService.deleteEmployeeById(existingEmployee.getId());
-        assertFalse(existingEmployee.getStatus());
-        verify(employeeRepository, times(1)).deleteEmployeeById(any());
+        employeeService.addEmployee(existingEmployee);
+        when(employeeRepository.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
+        doAnswer(invocation -> {
+                existingEmployee.setStatus(false);
+            return null;
+        }).when(employeeRepository).deleteEmployeeById(existingEmployee.getId());
 
-    }*/
-  
+        employeeService.deleteEmployeeById(existingEmployee.getId());
+
+        assertFalse(existingEmployee.getStatus());
+        verify(employeeRepository, times(1)).getEmployeeById(existingEmployee.getId());
+        verify(employeeRepository, times(1)).deleteEmployeeById(existingEmployee.getId());
+    }
+    @Test
+    void should_throw_exception_when_delete_already_inactive_employee() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException, EmployeeNotFoundException, EmployeeAlreadyInactiveException {
+        Employee existingEmployee = new Employee();
+        existingEmployee.setName("John");
+        existingEmployee.setGender("male");
+        existingEmployee.setAge(35);
+        existingEmployee.setSalary(25000);
+        employeeService.addEmployee(existingEmployee);
+
+
+        when(employeeRepository.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
+        doAnswer(invocation -> {
+            existingEmployee.setStatus(false);
+            return null;
+        }).when(employeeRepository).deleteEmployeeById(existingEmployee.getId());
+        employeeService.deleteEmployeeById(existingEmployee.getId());
+
+
+        assertThrows(EmployeeAlreadyInactiveException.class, () -> {
+            employeeService.deleteEmployeeById(existingEmployee.getId());
+        });
+        verify(employeeRepository, times(2)).getEmployeeById(existingEmployee.getId());
+    }
+    @Test
+    void should_throw_exception_when_update_inactive_employee() {
+        Employee inactiveEmployee = new Employee();
+        inactiveEmployee.setId(1);
+        inactiveEmployee.setName("John");
+        inactiveEmployee.setGender("male");
+        inactiveEmployee.setAge(35);
+        inactiveEmployee.setSalary(25000);
+        inactiveEmployee.setStatus(false);
+
+        when(employeeRepository.getEmployeeById(1)).thenReturn(inactiveEmployee);
+
+        Employee updatedEmployee = new Employee();
+        updatedEmployee.setName("John Updated");
+        updatedEmployee.setGender("male");
+        updatedEmployee.setAge(36);
+        updatedEmployee.setSalary(26000);
+
+        assertThrows(EmployeeAlreadyInactiveException.class, () -> {
+            employeeService.updateEmployeeById(1, updatedEmployee);
+        });
+        verify(employeeRepository, times(1)).getEmployeeById(1);
+    }
 }

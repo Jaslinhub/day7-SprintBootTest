@@ -1,9 +1,6 @@
 package org.example.springboottest.Controller;
 
-import org.example.springboottest.Service.EmployeeAlreadyExistsException;
-import org.example.springboottest.Service.EmployeeNotAmongLeaglAgeException;
-import org.example.springboottest.Service.EmployeeNotFoundException;
-import org.example.springboottest.Service.EmployeeNotQualifiedException;
+import org.example.springboottest.Service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,4 +30,9 @@ public class GlobalExceptionHandler {
     public String handleEmployeeNotQualifiedException(EmployeeNotQualifiedException ex) {
         return ex.getMessage();
     }
+
+    @ExceptionHandler(EmployeeAlreadyInactiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleEmployeeAlreadyInactiveException(EmployeeAlreadyInactiveException ex) {
+        return ex.getMessage(); }
 }
