@@ -1,13 +1,30 @@
 package org.example.springboottest.Entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "t_employee")
 public class Employee {
+
     private String name;
     private int age;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String gender;
     private double salary;
     private boolean status;
 
+    @Column(name = "company_id")
+    private int companyId;
+
+    public int getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+    }
     public Employee() {
     }
 

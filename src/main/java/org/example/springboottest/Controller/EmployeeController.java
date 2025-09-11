@@ -1,18 +1,15 @@
 package org.example.springboottest.Controller;
 
+import org.example.springboottest.Dto.UpdateEmployeeReq;
 import org.example.springboottest.Entity.Employee;
-import org.example.springboottest.Service.EmployeeAlreadyExistsException;
-import org.example.springboottest.Service.EmployeeAlreadyInactiveException;
-import org.example.springboottest.Service.EmployeeNotQualifiedException;
+import org.example.springboottest.Exception.EmployeeAlreadyExistsException;
+import org.example.springboottest.Exception.EmployeeAlreadyInactiveException;
+import org.example.springboottest.Exception.EmployeeNotQualifiedException;
 import org.example.springboottest.Service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +19,9 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping("/employees")
-    public Map<String,Object> createEmployee(@RequestBody Employee employee) throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {;
-        return employeeService.addEmployee(employee);
-
-
+    public Map<String,Object> createEmployee(@RequestBody Employee employee) throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
+        Employee created = employeeService.addEmployee(employee);
+        return Map.of("id", created.getId(), "name", created.getName());
     }
     @GetMapping("/employees/All")
     public List<Employee> getAllEmployees(){
@@ -45,25 +41,21 @@ public class EmployeeController {
 
     }
     @PutMapping("/employees/{id}")
-    public Employee updateEmployeeById(@PathVariable int id,@RequestBody Employee updatedEmployee) throws EmployeeAlreadyInactiveException {
-        return employeeService.updateEmployeeById(id,updatedEmployee);
-
-
-
+    public Employee updateEmployeeById(@PathVariable int id,@RequestBody UpdateEmployeeReq updatedEmployeeReq) throws EmployeeAlreadyInactiveException {
+        return employeeService.updateEmployeeById(id,updatedEmployeeReq);
     }
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployeeById(@PathVariable int id) throws EmployeeAlreadyInactiveException {
-        return employeeService.deleteEmployeeById(id);
+        employeeService.deleteEmployeeById(id);
+        return ResponseEntity.noContent().build();
+    }
 
-
-        }
-
-        @GetMapping("/employees/page")
-        public ResponseEntity<List<Employee>> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
-        return employeeService.getEmployeesByPage(page,pageSize);
-
-        }
+    @GetMapping("/employees/page")
+    public ResponseEntity<List<Employee>> getEmployeesByPage(@RequestParam int page,@RequestParam int pageSize){
+        List<Employee> employees = employeeService.getEmployeesByPage(page,pageSize);
+        return ResponseEntity.ok(employees);
+    }
 
     public void clearEmployees() {
         employeeService.clear();

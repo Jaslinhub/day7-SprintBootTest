@@ -1,4 +1,4 @@
-package org.example.springboottest.Service;
+package org.example.springboottest.Exception;
 
 public class EmployeeNotFoundException extends RuntimeException {
     public EmployeeNotFoundException(String message) {

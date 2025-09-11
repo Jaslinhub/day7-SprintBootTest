@@ -2,6 +2,7 @@ package org.example.springboottest;
 
 import org.example.springboottest.Controller.CompanyController;
 import org.example.springboottest.Entity.Company;
+import org.example.springboottest.Entity.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

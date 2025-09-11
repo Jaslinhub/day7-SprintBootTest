@@ -1,8 +1,21 @@
 package org.example.springboottest.Entity;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "t_company")
 public class Company {
-    private String name;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private List<Employee> employee = new ArrayList<>();
 
     public Company() {
     }
@@ -25,5 +38,11 @@ public class Company {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public List<Employee> getEmployee() {
+        return employee;
+    }
+    public void setEmployee(List<Employee> employee) {
+        this.employee = employee;
     }
 }

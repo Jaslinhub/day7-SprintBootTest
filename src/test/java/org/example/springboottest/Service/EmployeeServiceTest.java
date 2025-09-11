@@ -1,9 +1,9 @@
 package org.example.springboottest.Service;
 
+import org.example.springboottest.Dto.UpdateEmployeeReq;
 import org.example.springboottest.Entity.Employee;
-import org.example.springboottest.Repository.EmployeeRepository;
-import org.example.springboottest.Service.EmployeeNotAmongLeaglAgeException;
-import org.example.springboottest.Service.EmployeeService;
+import org.example.springboottest.Exception.*;
+import org.example.springboottest.Repository.EmployeeRepositoryInmemoryImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class EmployeeServiceTest {
     @Mock
-    private EmployeeRepository employeeRepository;
+    private EmployeeRepositoryInmemoryImpl employeeRepositoryInmemoryImpl;
 
     @InjectMocks
     private EmployeeService employeeService;
@@ -36,11 +36,11 @@ class EmployeeServiceTest {
     }
     @Test
     void should_throw_exception_when_employee_is_not_existed() {
-        when(employeeRepository.getEmployeeById(1)).thenReturn(null);
+        when(employeeRepositoryInmemoryImpl.getEmployeeById(1)).thenReturn(null);
         assertThrows(EmployeeNotFoundException.class, () -> {
             employeeService.getEmployeeById(1);
         });
-        verify(employeeRepository,times(1)).getEmployeeById(1);
+        verify(employeeRepositoryInmemoryImpl,times(1)).getEmployeeById(1);
     }
     @Test
     void should_not_create_employee_when_age_is_above_30_and_salary_below_20000() {
@@ -52,7 +52,7 @@ class EmployeeServiceTest {
         assertThrows(EmployeeNotQualifiedException.class, () -> {
             employeeService.addEmployee(employee);
         });
-        verify(employeeRepository, times(0)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(0)).add(any());
     }
     @Test
     void should_not_create_employee_when_age_is_below_30_and_salary_below_20000() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
@@ -62,7 +62,7 @@ class EmployeeServiceTest {
         employee.setGender("male");
         employee.setSalary(5000);
         employeeService.addEmployee(employee);
-        verify(employeeRepository, times(1)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(1)).add(any());
     }
     @Test
     void should_not_create_employee_when_age_is_below_30_and_salary_above_20000() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
@@ -72,7 +72,7 @@ class EmployeeServiceTest {
         employee.setGender("male");
         employee.setSalary(25000);
         employeeService.addEmployee(employee);
-        verify(employeeRepository, times(1)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(1)).add(any());
     }
     @Test
     void should_not_create_employee_when_age_is_above_30_and_salary_above_20000() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
@@ -82,7 +82,7 @@ class EmployeeServiceTest {
         employee.setGender("male");
         employee.setSalary(25000);
         employeeService.addEmployee(employee);
-        verify(employeeRepository, times(1)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(1)).add(any());
     }
     @Test
     void should_create_new_employee_when_status_is_true() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
@@ -96,7 +96,7 @@ class EmployeeServiceTest {
         employeeService.addEmployee(employee);
         employeeService.addEmployee(existingEmployee);
         assertTrue(employee.getStatus());
-        verify(employeeRepository, times(2)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(2)).add(any());
     }
     @Test
     void should_not_create_new_employee_when_same_name_and_gender() throws EmployeeNotQualifiedException , EmployeeAlreadyExistsException {
@@ -113,13 +113,13 @@ class EmployeeServiceTest {
         newEmployee.setAge(35);
         newEmployee.setSalary(30000);
 
-        when(employeeRepository.getAllEmployeesByGender("male"))
+        when(employeeRepositoryInmemoryImpl.getAllEmployeesByGender("male"))
                 .thenReturn(List.of(existingEmployee));
         assertThrows(EmployeeAlreadyExistsException.class, () -> {
             employeeService.addEmployee(newEmployee);
         });
 
-        verify(employeeRepository, times(0)).add(any());
+        verify(employeeRepositoryInmemoryImpl, times(0)).add(any());
     }
     @Test
     void should_set_status_false_when_delete_employee() throws EmployeeNotFoundException, EmployeeNotQualifiedException, EmployeeAlreadyExistsException, EmployeeAlreadyInactiveException {
@@ -129,17 +129,17 @@ class EmployeeServiceTest {
         existingEmployee.setAge(35);
         existingEmployee.setSalary(25000);
         employeeService.addEmployee(existingEmployee);
-        when(employeeRepository.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
+        when(employeeRepositoryInmemoryImpl.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
         doAnswer(invocation -> {
                 existingEmployee.setStatus(false);
             return null;
-        }).when(employeeRepository).deleteEmployeeById(existingEmployee.getId());
+        }).when(employeeRepositoryInmemoryImpl).deleteEmployeeById(existingEmployee.getId());
 
         employeeService.deleteEmployeeById(existingEmployee.getId());
 
         assertFalse(existingEmployee.getStatus());
-        verify(employeeRepository, times(1)).getEmployeeById(existingEmployee.getId());
-        verify(employeeRepository, times(1)).deleteEmployeeById(existingEmployee.getId());
+        verify(employeeRepositoryInmemoryImpl, times(1)).getEmployeeById(existingEmployee.getId());
+        verify(employeeRepositoryInmemoryImpl, times(1)).deleteEmployeeById(existingEmployee.getId());
     }
     @Test
     void should_throw_exception_when_delete_already_inactive_employee() throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException, EmployeeNotFoundException, EmployeeAlreadyInactiveException {
@@ -151,18 +151,18 @@ class EmployeeServiceTest {
         employeeService.addEmployee(existingEmployee);
 
 
-        when(employeeRepository.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
+        when(employeeRepositoryInmemoryImpl.getEmployeeById(existingEmployee.getId())).thenReturn(existingEmployee);
         doAnswer(invocation -> {
             existingEmployee.setStatus(false);
             return null;
-        }).when(employeeRepository).deleteEmployeeById(existingEmployee.getId());
+        }).when(employeeRepositoryInmemoryImpl).deleteEmployeeById(existingEmployee.getId());
         employeeService.deleteEmployeeById(existingEmployee.getId());
 
 
         assertThrows(EmployeeAlreadyInactiveException.class, () -> {
             employeeService.deleteEmployeeById(existingEmployee.getId());
         });
-        verify(employeeRepository, times(2)).getEmployeeById(existingEmployee.getId());
+        verify(employeeRepositoryInmemoryImpl, times(2)).getEmployeeById(existingEmployee.getId());
     }
     @Test
     void should_throw_exception_when_update_inactive_employee() {
@@ -172,19 +172,19 @@ class EmployeeServiceTest {
         inactiveEmployee.setGender("male");
         inactiveEmployee.setAge(35);
         inactiveEmployee.setSalary(25000);
-        inactiveEmployee.setStatus(false);
+        inactiveEmployee.setStatus(false);//写个构造函数，全局
 
-        when(employeeRepository.getEmployeeById(1)).thenReturn(inactiveEmployee);
+        when(employeeRepositoryInmemoryImpl.getEmployeeById(1)).thenReturn(inactiveEmployee);
 
-        Employee updatedEmployee = new Employee();
+        UpdateEmployeeReq updatedEmployee = new UpdateEmployeeReq();
         updatedEmployee.setName("John Updated");
         updatedEmployee.setGender("male");
         updatedEmployee.setAge(36);
-        updatedEmployee.setSalary(26000);
+        updatedEmployee.setSalary(26000.0);
 
         assertThrows(EmployeeAlreadyInactiveException.class, () -> {
             employeeService.updateEmployeeById(1, updatedEmployee);
         });
-        verify(employeeRepository, times(1)).getEmployeeById(1);
+        verify(employeeRepositoryInmemoryImpl, times(1)).getEmployeeById(1);
     }
 }

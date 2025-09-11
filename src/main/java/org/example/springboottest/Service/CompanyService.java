@@ -3,13 +3,8 @@ package org.example.springboottest.Service;
 import org.example.springboottest.Entity.Company;
 import org.example.springboottest.Repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,11 +31,11 @@ public class CompanyService {
         return companyRepository.updateCompanyById(id,updatedCompany);
     }
 
-    public ResponseEntity<Void> deleteCompanyById(int id) {
-        return companyRepository.deleteCompanyById(id);
+    public void deleteCompanyById(int id) {
+        companyRepository.deleteCompanyById(id);
     }
 
-    public ResponseEntity<List<Company>> getCompaniesByPage(int page, int pageSize) {
+    public List<Company> getCompaniesByPage(int page, int pageSize) {
         return companyRepository.getCompaniesByPage(page,pageSize);
     }
 

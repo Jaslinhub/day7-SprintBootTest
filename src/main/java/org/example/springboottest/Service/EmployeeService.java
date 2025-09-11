@@ -1,17 +1,13 @@
 package org.example.springboottest.Service;
 
+import org.example.springboottest.Dto.UpdateEmployeeReq;
 import org.example.springboottest.Entity.Employee;
+import org.example.springboottest.Exception.*;
 import org.example.springboottest.Repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class EmployeeService {
@@ -19,7 +15,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
 
-    public Map<String,Object> addEmployee(Employee employee) throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
+    public Employee addEmployee(Employee employee) throws EmployeeNotQualifiedException, EmployeeAlreadyExistsException {
         int age=employee.getAge();
         if (age!=0) {
             if(age<18||age>65){
@@ -29,7 +25,6 @@ public class EmployeeService {
                 throw new EmployeeNotQualifiedException("For employees older than 30, the salary must be at least 20000");
             }
         }
-
         List<Employee> sameNameGenderEmployees = employeeRepository.getAllEmployeesByGender(employee.getGender());
         for (Employee e : sameNameGenderEmployees) {
             if (e.getName().equals(employee.getName())) {
@@ -38,9 +33,7 @@ public class EmployeeService {
         }
         employee.setStatus(true);
         employeeRepository.add(employee);
-
-        return Map.of("id",employee.getId(),"name",employee.getName());
-
+        return employee;
     }
 
     public List<Employee> getAllEmployees() {
@@ -62,7 +55,7 @@ public class EmployeeService {
 
     }
 
-    public Employee updateEmployeeById(int id, Employee updatedEmployee) throws EmployeeAlreadyInactiveException {
+    public Employee updateEmployeeById(int id, UpdateEmployeeReq updateEmployeeReq) throws EmployeeAlreadyInactiveException {
         Employee employee = employeeRepository.getEmployeeById(id);
         if (employee == null) {
             throw new EmployeeNotFoundException("Employee with id " + id + " not found");
@@ -70,10 +63,14 @@ public class EmployeeService {
         if (!employee.getStatus()) {
             throw new EmployeeAlreadyInactiveException("Employee with id " + id + " is inactive");
         }
-        return employeeRepository.updateEmployeeById(id,updatedEmployee);
+        employee.setName(updateEmployeeReq.getName());
+        employee.setAge(updateEmployeeReq.getAge());
+        employee.setGender(updateEmployeeReq.getGender());
+        employee.setSalary(updateEmployeeReq.getSalary());
+        return employeeRepository.updateEmployeeById(id,employee);
     }
 
-    public ResponseEntity<Void> deleteEmployeeById(int id) throws EmployeeAlreadyInactiveException {
+    public void deleteEmployeeById(int id) throws EmployeeAlreadyInactiveException {
         Employee employee= employeeRepository.getEmployeeById(id);
         if(employee==null){
             throw new EmployeeNotFoundException("Employee with id "+id+" not found");
@@ -81,12 +78,15 @@ public class EmployeeService {
         if(!employee.getStatus()){
             throw new EmployeeAlreadyInactiveException("Employee with id "+id+" is already inactive");
         }
-
-        return employeeRepository.deleteEmployeeById(id);
+        employeeRepository.deleteEmployeeById(id);
     }
 
-    public ResponseEntity<List<Employee>> getEmployeesByPage(int page, int pageSize) {
-        return employeeRepository.getEmployeesByPage(page,pageSize);
+    public List<Employee> getEmployeesByPage(int page, int pageSize) {
+        List<Employee> result =  employeeRepository.getEmployeesByPage(page,pageSize);
+        if(result.isEmpty()){
+            throw new EmployeeNotFoundException("No employees found for the given page and page size");
+        }
+        return result;
     }
 
     public void clear() {
