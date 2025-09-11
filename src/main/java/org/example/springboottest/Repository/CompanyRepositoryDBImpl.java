@@ -3,6 +3,7 @@ package org.example.springboottest.Repository;
 import org.example.springboottest.Entity.Company;
 import org.example.springboottest.Repository.Dao.CompanyJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class CompanyRepositoryDBImpl implements CompanyRepository {
 
     @Override
     public List<Company> getCompaniesByPage(int page, int pageSize) {
-        return companyRepository.findAll(org.springframework.data.domain.PageRequest.of(page,pageSize)).getContent();
+        return companyRepository.findAll(PageRequest.of(page-1,pageSize)).getContent();
     }
 
     @Override

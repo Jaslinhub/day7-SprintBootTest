@@ -2,6 +2,7 @@ package org.example.springboottest.Controller;
 
 import org.example.springboottest.Entity.Company;
 import org.example.springboottest.Entity.Employee;
+import org.example.springboottest.Exception.CompanyNotFundException;
 import org.example.springboottest.Service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/page")
-    public ResponseEntity<List<Company>> getCompaniesByPage(@RequestParam int page,@RequestParam int pageSize){
+    public ResponseEntity<List<Company>> getCompaniesByPage(@RequestParam int page,@RequestParam int pageSize) throws CompanyNotFundException {
         companyService.getCompaniesByPage(page,pageSize);
         return ResponseEntity.ok(companyService.getCompaniesByPage(page,pageSize));
     }

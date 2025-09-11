@@ -35,4 +35,9 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleEmployeeAlreadyInactiveException(EmployeeAlreadyInactiveException ex) {
         return ex.getMessage(); }
+
+    @ExceptionHandler(CompanyNotFundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleCompanyNotFundException(CompanyNotFundException ex) {
+        return ex.getMessage(); }
 }

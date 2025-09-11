@@ -1,6 +1,7 @@
 package org.example.springboottest.Service;
 
 import org.example.springboottest.Entity.Company;
+import org.example.springboottest.Exception.CompanyNotFundException;
 import org.example.springboottest.Repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,12 @@ public class CompanyService {
         companyRepository.deleteCompanyById(id);
     }
 
-    public List<Company> getCompaniesByPage(int page, int pageSize) {
-        return companyRepository.getCompaniesByPage(page,pageSize);
+    public List<Company> getCompaniesByPage(int page, int pageSize) throws CompanyNotFundException {
+        List<Company> allCompanies = companyRepository.getCompaniesByPage(page, pageSize);
+        if(allCompanies.isEmpty()){
+            throw new CompanyNotFundException("No companies available");
+        }
+        return allCompanies;
     }
 
     public void clearCompanies() {
